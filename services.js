@@ -1,11 +1,11 @@
 const axios = require('axios');
+const URL_base = 'http://localhost:3000/api/users';
 
 const getUsers = async (params = null) => {
   try {
-    const url = 'http://localhost:3000/api/users';
     const response = params 
-      ? await axios.get(url, { params }) 
-      : await axios.get(url);
+      ? await axios.get(URL_base, { params }) 
+      : await axios.get(URL_base);
     
     console.log('Usuarios:', response.data);
     return response.data;
@@ -16,8 +16,8 @@ const getUsers = async (params = null) => {
 
 const getUserById = async (id) => {
   try {
-    const url = `http://localhost:3000/api/users/${id}`;
-    const response = await axios.get(url);
+    const URL = URL_base+`/${id}`;
+    const response = await axios.get(URL);
     
     console.log('Usuario:', response.data);
     return response.data;
@@ -29,8 +29,7 @@ const getUserById = async (id) => {
 
 const createUser = async (userData) => {
   try {
-    const url = 'http://localhost:3000/api/users';
-    const response = await axios.post(url, userData);  // Mandando el JSON completo como body
+    const response = await axios.post(URL_base, userData);  // Mandando el JSON completo como body
     
     console.log('Usuario creado:', response.data);
     return response.data;
@@ -42,8 +41,8 @@ const createUser = async (userData) => {
 
 const updateUser = async (id, userData) => {
   try {
-    const url = `http://localhost:3000/api/users/${id}`;
-    const response = await axios.put(url, userData);  // Mandando el JSON completo como body
+    const URL = URL_base+`/${id}`;
+    const response = await axios.put(URL, userData);  // Mandando el JSON completo como body
     
     console.log('Usuario actualizado:', response.data);
     return response.data;
@@ -55,8 +54,8 @@ const updateUser = async (id, userData) => {
 
 const patchUser = async (id, updateData) => {
   try {
-    const url = `http://localhost:3000/api/users/${id}`;
-    const response = await axios.patch(url, updateData);
+    const URL = URL_base+ `/${id}`;
+    const response = await axios.patch(URL, updateData);
     
     console.log('Usuario actualizado parcialmente:', response.data);
     return response.data;
@@ -68,8 +67,8 @@ const patchUser = async (id, updateData) => {
 
 const deleteUser = async (id) => {
   try {
-    const url = `http://localhost:3000/api/users/${id}`;
-    const response = await axios.delete(url);
+    const URL = URL_base + `/${id}`;
+    const response = await axios.delete(URL);
     
     console.log('Usuario eliminado:', response.data);
     return response.data;
