@@ -59,6 +59,16 @@ class UserController {
     if (!req.body || typeof req.body !== "object") {
       return res.status(400).json({ message: "El cuerpo de la petición debe ser un JSON válido." });
     }
+
+    // Verificar tipos de datos
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
+      return res.status(400).json({ message: "Los datos enviados deben ser de tipo string." });
+    }
+
+    // Verificar que la cadena no se encuentre vacia.
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      return res.status(400).json({ message: "Los campos no pueden estar vacíos." });
+    }  
     
     // Validaciones para asegurar que los campos necesarios están presentes
     if (!name || !email || !password) {
@@ -131,6 +141,24 @@ class UserController {
         updatedUser.token = existingUser.token; // No modificar el token
       }
 
+      // Verificar tipos de datos
+      if (updatedUser.name && typeof updatedUser.name !== "string") {
+        return res.status(400).json({ message: "El nombre debe ser una cadena de texto." });
+      }
+      
+      if (updatedUser.email && typeof updatedUser.email !== "string") {
+          return res.status(400).json({ message: "El email debe ser una cadena de texto." });
+      }
+      
+      if (updatedUser.password && typeof updatedUser.password !== "string") {
+          return res.status(400).json({ message: "La contraseña debe ser una cadena de texto." });
+      }
+
+      // Verificar que la cadena no se encuentre vacia.
+      if (!updatedUser.name.trim() || !updatedUser.email.trim() || !updatedUser.password.trim()) {
+        return res.status(400).json({ message: "Los campos no pueden estar vacíos." });
+      }  
+
       // Validación del correo electrónico si se intenta actualizar
       if (updatedUser.email && !UserController.emailRegex.test(updatedUser.email)) {
         return res.status(400).json({ message: "El correo electrónico no es válido." });
@@ -193,6 +221,24 @@ class UserController {
     if (eventData.name) updatedData.name = eventData.name;
     if (eventData.email) updatedData.email = eventData.email;
     if (eventData.password) updatedData.password = eventData.password;
+
+    // Verificar tipos de datos
+    if (updatedUser.name && typeof updatedUser.name !== "string") {
+      return res.status(400).json({ message: "El nombre debe ser una cadena de texto." });
+    }
+    
+    if (updatedUser.email && typeof updatedUser.email !== "string") {
+        return res.status(400).json({ message: "El email debe ser una cadena de texto." });
+    }
+    
+    if (updatedUser.password && typeof updatedUser.password !== "string") {
+        return res.status(400).json({ message: "La contraseña debe ser una cadena de texto." });
+    }
+
+    // Verificar que la cadena no se encuentre vacia.
+    if (!updatedUser.name.trim() || !updatedUser.email.trim() || !updatedUser.password.trim()) {
+      return res.status(400).json({ message: "Los campos no pueden estar vacíos." });
+    }  
 
     // Validación del correo electrónico si se intenta actualizar
     if (updatedData.email && !UserController.emailRegex.test(updatedData.email)) {

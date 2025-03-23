@@ -37,6 +37,19 @@ class User {
     }
   }
 
+  // Obtener un usuario por Token
+  static async getUserByToken(token) {
+    try {
+      const snapshot = await collection.where("bearerToken", "==", token).get();
+      if (snapshot.empty) return null; // No se encontró el usuario
+
+      // Devuelve el primer usuario encontrado
+      return this._transformDocument(snapshot.docs[0]);
+    } catch (error) {
+      console.error("Error en getUserByToken:", error);
+      throw new Error("Error al obtener el usuario por token");
+    }
+  }
 
   // Crear un nuevo usuario
   static async createUser(userData) {
@@ -69,6 +82,21 @@ class User {
     } catch (error) {
       console.error("Error en updateUser:", error);
       throw new Error("Error al actualizar el usuario");
+    }
+  }
+
+  // Actualizar SOLO la lista de clientes del usuario
+  static async updateUserClients(id, clientes) {
+    try {
+      const doc = await collection.doc(id).get(); // Asegúrate de que `collection` es tu referencia correcta
+      if (!doc.exists) {
+        throw new Error("Usuario no encontrado"); // Si no existe, lanzamos un error
+      }
+
+      await doc.ref.update({ clientes }); // Actualiza el campo 'clientes' en el documento
+    } catch (error) {
+      console.error("Error al actualizar la lista de clientes:", error);
+      throw new Error("Error al actualizar la lista de clientes");
     }
   }
 

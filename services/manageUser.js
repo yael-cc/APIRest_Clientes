@@ -1,5 +1,5 @@
 const axios = require('axios');
-const URL_base = 'http://localhost:3000/api/users';
+const URL_base = 'https://apirest-clientes.onrender.com/api/users';
 
 const getUsers = async (params = null) => {
   try {
@@ -77,4 +77,11 @@ const deleteUser = async (id) => {
   }
 };
 
-
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  patchUser,
+  deleteUser
+};
