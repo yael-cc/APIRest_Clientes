@@ -2,6 +2,11 @@
 
 Este proyecto es una API REST construida con Node.js y Firebase, diseñada para gestionar usuarios y clientes con autenticación basada en `bearerToken`.  
 
+## 📌 Integrantes
+- Cuevas Cruz Luis Angel Yael
+- Aguilar Sanchez Carlos Daniel
+- Jimenez Larios Luis Mario
+
 ## 📌 Características
 
 - 🔐 **Autenticación con `bearerToken`** generado automáticamente al registrar un usuario.  

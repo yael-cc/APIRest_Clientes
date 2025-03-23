@@ -32,12 +32,18 @@ class UserController {
 
     try {
       const user = await User.getUserById(id);  // Buscar usuario por ID en el modelo
+
+      // Si el usuario no se encuentra, devolver 404
       if (!user) {
         return res.status(404).json({ message: "Usuario no encontrado." });
       }
-      res.status(200).json(user);  // Si se encuentra el usuario, devolverlo
+
+      // Si el usuario se encuentra, devolverlo
+      res.status(200).json(user);
+      
     } catch (error) {
-      console.error(error);
+      // En caso de error al interactuar con la base de datos, devolver 500
+      console.error("Error al obtener el usuario:", error);
       res.status(500).json({
         message: "Error al obtener el usuario",
         error: error.message
@@ -49,6 +55,11 @@ class UserController {
   static async createUser(req, res) {
     const { name, email, password } = req.body;
 
+    // Verificar si el `body` es un objeto válido
+    if (!req.body || typeof req.body !== "object") {
+      return res.status(400).json({ message: "El cuerpo de la petición debe ser un JSON válido." });
+    }
+    
     // Validaciones para asegurar que los campos necesarios están presentes
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Faltan datos requeridos (name, email, password)." });
@@ -89,50 +100,60 @@ class UserController {
     }
   }
 
+
   // Método para actualizar completamente un usuario (PUT)
   static async updateUser(req, res) {
     const eventData = req.body;
-    
-    // Buscar el usuario actual en la base de datos usando el ID
-    const existingUser = await User.getUserById(req.params.id);
 
-    // Verificar si el usuario existe.
-    if (!existingUser) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-
-    // Verificar si el token es parte de los datos enviados y si existe un intento de modificarlo
-    if (eventData.bearerToken) {
-      return res.status(400).json({
-        message: "No puedes modificar el Bearer Token",
-      });
-    }
-
-    // Validación del correo electrónico si se intenta actualizar
-    if (eventData.email && !UserController.emailRegex.test(eventData.email)) {
-      return res.status(400).json({ message: "El correo electrónico no es válido." });
-    }
-
-    // Validación de la contraseña si se intenta actualizar
-    if (eventData.password && eventData.password.length < 6) {
-      return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres." });
+    // Verificar si el `body` es un objeto válido
+    if (!req.body || typeof req.body !== "object") {
+      return res.status(400).json({ message: "El cuerpo de la petición debe ser un JSON válido." });
     }
 
     try {
-      // Actualizar todos los campos con los datos enviados (sin el bearerToken)
-      const updatedUser = {
-        name: eventData.name || existingUser.name,
-        email: eventData.email || existingUser.email,
-        password: eventData.password || existingUser.password,
-        token: existingUser.token, // El token no se debe modificar
-      };
+      // Buscar el usuario actual en la base de datos usando el ID
+      const existingUser = await User.getUserById(req.params.id);
 
-      // Actualizamos el usuario
+      // Verificar si el usuario existe.
+      if (!existingUser) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      // Filtrar solo los campos que se desean actualizar
+      const updatedUser = {};
+
+      if (eventData.name) updatedUser.name = eventData.name;
+      if (eventData.email) updatedUser.email = eventData.email;
+      if (eventData.password) updatedUser.password = eventData.password;
+
+      // Asegurarse de no incluir el `token` en la actualización, solo si ya existe.
+      if (existingUser.token) {
+        updatedUser.token = existingUser.token; // No modificar el token
+      }
+
+      // Validación del correo electrónico si se intenta actualizar
+      if (updatedUser.email && !UserController.emailRegex.test(updatedUser.email)) {
+        return res.status(400).json({ message: "El correo electrónico no es válido." });
+      }
+
+      // Validación de la contraseña si se intenta actualizar
+      if (updatedUser.password && updatedUser.password.length < 6) {
+        return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres." });
+      }
+
+      // Si no se envían datos para actualizar, devolvemos un mensaje de error
+      if (Object.keys(updatedUser).length === 0) {
+        return res.status(400).json({
+          message: "No se proporcionaron datos para actualizar.",
+        });
+      }
+
+      // Ahora pasamos los datos correctamente a la función de actualización
       await User.updateUser(req.params.id, updatedUser);
 
       return res.status(200).json({
         message: "Usuario actualizado correctamente",
-        updatedUser,
+        updatedUser: { id: req.params.id, ...updatedUser },
       });
     } catch (error) {
       return res.status(400).json({
@@ -141,10 +162,16 @@ class UserController {
     }
   }
 
+
   // Método para actualizar parcialmente un usuario (PATCH)
   static async patchUser(req, res) {
     const eventData = req.body;
 
+    // Verificar si el `body` es un objeto válido
+    if (!req.body || typeof req.body !== "object") {
+      return res.status(400).json({ message: "El cuerpo de la petición debe ser un JSON válido." });
+    }
+    
     // Buscar el usuario actual en la base de datos usando el ID
     const existingUser = await User.getUserById(req.params.id);
 
@@ -193,8 +220,15 @@ class UserController {
         updatedUser: { id: req.params.id, ...updatedData },
       });
     } catch (error) {
-      return res.status(400).json({
+      // Si el error es de usuario no encontrado, manejalo específicamente
+      if (error.message === "Usuario no encontrado") {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+  
+      // Otros errores de actualización
+      return res.status(500).json({
         message: "No se pudo actualizar el usuario",
+        error: error.message,
       });
     }
   }
