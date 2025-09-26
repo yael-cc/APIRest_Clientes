@@ -1,6 +1,6 @@
 # 🚀 API con Firebase y Node.js
 
-Este proyecto es una API REST construida con Node.js y Firebase, diseñada para gestionar usuarios y clientes con autenticación basada en `bearerToken`.  
+Este proyecto es una API REST construida con Node.js y Firebase, diseñada para gestionar usuarios y clientes con autenticación basada en `bearerToken`.  Prueba git
 
 ## 📌 Integrantes
 - Cuevas Cruz Luis Angel Yael
